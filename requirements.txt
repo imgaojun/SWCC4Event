@@ -1,0 +1,3 @@
+texar-pytorch
+pytorch
+tqdm
