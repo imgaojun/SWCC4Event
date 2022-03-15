@@ -27,3 +27,12 @@ CUDA_VISIBLE_DEVICES=0 python3 main.py --do-train
 CUDA_VISIBLE_DEVICES=3 python3 main.py --do-eval --checkpoint ./outputs/checkpoint0.pt 
 ```
 
+### Citation
+```
+@inproceedings{gao2022improving,
+ author = {Jun Gao and Wei Wang and Changlong Yu and Huan Zhao and Wilfred Ng and Ruifeng Xu},
+ booktitle = {Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics},
+ title = {Improving Event Representation via Simultaneous Weakly Supervised Contrastive Learning and Clustering},
+ year = {2022}
+}
+```
