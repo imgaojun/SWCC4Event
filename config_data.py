@@ -1,4 +1,4 @@
-max_train_epoch = 10
+max_train_epoch = 2
 display_steps = 100
 eval_steps = 1000
 save_steps = 1000
@@ -20,7 +20,7 @@ train_hparams={
 valid_hparams={
         'dataset': { 'files': 'data_utils/valid.json',
                      'vocab_file': vocab_file},
-        'batch_size': 256,
+        'batch_size': 64,
         "allow_smaller_final_batch": False,
         'shuffle': False,
 
