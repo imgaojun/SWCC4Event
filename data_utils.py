@@ -11,7 +11,7 @@ import json
 from tqdm import tqdm
 from pathlib import Path
 import pickle
-
+# from nltk import WordNetLemmatizer
 Example = Tuple[np.ndarray, np.ndarray]
 
 tokenizer = tx.data.BERTTokenizer(pretrained_model_name="bert-base-uncased")
@@ -23,6 +23,7 @@ def freq_norm(val):
     
 
 def map_evt_to_tokens(evt):
+    # evt ='<cls> ' + ' <sep> '.join(evt) + ' <sep>'
     evt = [evt[1],evt[0],evt[2]]
     evt = ' '.join(evt)
     evt = evt.replace("''","").lower().split()
@@ -30,6 +31,8 @@ def map_evt_to_tokens(evt):
     return evt
 
 def map_evt_to_tokens_for_text(evt):
+    # evt ='<cls> ' + ' <sep> '.join(evt) + ' <sep>'
+    # evt = [evt[1],evt[0],evt[2]]
     evt = ' '.join(evt)
     evt = evt.replace("''","").lower().split()
     evt = ' '.join([tokenizer.cls_token]+evt+ [tokenizer.sep_token])
@@ -180,16 +183,20 @@ class HardData(tx.data.DatasetBase[Example, Example]):
         
         evt_a, evt_b, evt_c, evt_d  = \
                     raw_example[0], raw_example[1], raw_example[2],raw_example[3]
+        # evt_a = ['<cls>']+[evt_a[0]] +['<sub>']+ [evt_a[1]] +['<pred>']+ [evt_a[2]]+['<obj>']
         evt_a = map_evt_to_tokens(evt_a)
         evt_a_ids = tokenizer.map_text_to_id(evt_a)
 
+        # evt_b = ['<cls>']+[evt_b[0]] +['<sub>']+ [evt_b[1]] +['<pred>']+ [evt_b[2]]+['<obj>']
         evt_b = map_evt_to_tokens(evt_b)
         evt_b_ids = tokenizer.map_text_to_id(evt_b)
 
+        # evt_c = ['<cls>']+[evt_c[0]] +['<sub>']+ [evt_c[1]] +['<pred>']+ [evt_c[2]]+['<obj>']
         evt_c = map_evt_to_tokens(evt_c)
         evt_c_ids = tokenizer.map_text_to_id(evt_c)
 
 
+        # evt_d = ['<cls>']+[evt_d[0]] +['<sub>']+ [evt_d[1]] +['<pred>']+ [evt_d[2]]+['<obj>']
         evt_d = map_evt_to_tokens(evt_d)
         evt_d_ids = tokenizer.map_text_to_id(evt_d)
         
@@ -327,4 +334,3 @@ class Vocab(tx.data.Vocab):
         token_to_id_map_py = dict(zip(vocab, range(vocab_size)))
 
         return id_to_token_map_py, token_to_id_map_py
-

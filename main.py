@@ -13,7 +13,7 @@ from misc_utils import init_logger, logger
 
 import texar.torch as tx
 
-from model import SWCC, Memory_Bank
+from model import SWCC,Memory_Bank
 import data_utils
 import numpy as np
 import torch.nn.functional as F
@@ -99,7 +99,6 @@ def main() -> None:
     hard_data = data_utils.HardData(config_data.hard_hparams,device=device)
     hard_data_iterator = tx.data.DataIterator(hard_data)
 
-    
 
     hardext_data = data_utils.HardData(config_data.hardext_hparams,device=device)
     hardext_data_iterator = tx.data.DataIterator(hardext_data)
@@ -108,12 +107,16 @@ def main() -> None:
     trans_data_iterator = tx.data.DataIterator(trans_data)
 
     model = SWCC(config_model=config_model, config_data=config_data)
-
+    # if args.checkpoint:
+    #     logger.info(f"loading checkpoint {args.checkpoint}...")
+    #     model.load_state_dict(torch.load(args.checkpoint))
     model.to(device)
     
     memory_bank = Memory_Bank(config_model.bank_size,dim=config_model.hidden_dim)
     memory_bank.to(device)
 
+    # ce_loss_fn = nn.CrossEntropyLoss()
+    # ce_loss_fn.to(device)
     optim = torch.optim.Adam(
         model.parameters(), lr=config_model.lr, betas=(0.9, 0.997), eps=1e-9)
     mem_optim = torch.optim.Adam(
@@ -122,27 +125,29 @@ def main() -> None:
     def get_pos_neg_mask(logits):
         mask = torch.ones(logits.shape[0])
         mask = torch.diag_embed(mask)
+        # mask = torch.cat([mask, torch.zeros((logits.shape[0],config_model.bank_size))],dim=-1)
         return mask.to(device), (1-mask).to(device)
 
     def _update(batch):
         q, k1, k2, p, mlm_logits= model(batch)
         k1_topic_logits = memory_bank(k1)
         k2_topic_logits = memory_bank(k2)
-        k1_topic_logits = k1_topic_logits/config_model.tau
-        k2_topic_logits = k2_topic_logits/config_model.tau
+        k1_topic_logits = k1_topic_logits/config_model.moco_t
+        k2_topic_logits = k2_topic_logits/config_model.moco_t
         l_pos1 = torch.einsum('nc,ck->nk', [q, k1.T])
         l_pos2 = torch.einsum('nc,ck->nk', [q, k2.T])
         l_pos3 = torch.einsum('nc,nc->n', [q, p])
         
         
         labels = torch.arange(0, l_pos1.shape[0], dtype=torch.long).to(device)
-        l_pos1 = l_pos1/config_model.tau
-        l_pos2 = l_pos2/config_model.tau
-        l_pos3 = l_pos3/config_model.tau
+        l_pos1 = l_pos1/config_model.moco_t
+        l_pos2 = l_pos2/config_model.moco_t
+        l_pos3 = l_pos3/config_model.moco_t
         
         
         pos1_loss = F.cross_entropy(l_pos1, labels)
         pos2_loss = F.cross_entropy(l_pos2, labels)
+        # pos3_loss = F.cross_entropy(l_pos3, labels, reduction='none')
         
         
         pos_mask, neg_mask = get_pos_neg_mask(l_pos1)
@@ -161,6 +166,7 @@ def main() -> None:
         # self_sup_loss = 0.5*(- safe_log(pos1 / (pos1 + Ng) )).mean() + 0.5*(- safe_log(pos2 / (pos2 + Ng) )).mean()
         self_sup_loss = (pos1_loss+pos2_loss)/2
         weakly_sup_loss = (batch.evt_freq*(- safe_log(pos3 / (pos3 + Ng) ))).mean()
+        # weakly_sup_loss = (batch.evt_freq*pos3_loss).mean()
         nce_loss =  self_sup_loss + weakly_sup_loss
         
         sub_cluster_loss1 = distributed_sinkhorn(k1_topic_logits)*torch.log_softmax(k2_topic_logits,dim=-1)
@@ -212,6 +218,8 @@ def main() -> None:
             ab_sim = cosine_similarity(evt_a, evt_b)
             cd_sim = cosine_similarity(evt_c, evt_d)
             
+            # print(memory_bank(F.normalize(evt_a,dim=-1))[:10])
+
             ret = ab_sim > cd_sim
             hard_results += ret.tolist()
         hard_results = np.array(hard_results)
@@ -254,11 +262,12 @@ def main() -> None:
             if step % config_data.eval_steps == 0:
                 eval_results = _eval_model()
                 eval_results = np.array(eval_results)
-                if eval_results[0] >= 0.808 and eval_results[1] >=0.713 and eval_results[2] >= 0.8158:
+                if eval_results[0] >= 0.808 and eval_results[1] >=0.713:
                     best_eval_results = eval_results
                     _save_best_model(best_eval_results)
                 model.train()
-
+            # if step % config_data.save_steps == 0:
+            #     _save_step(step)
             step += 1
     if args.do_train:
         logger.info(f"start training...")
@@ -305,6 +314,6 @@ def main() -> None:
             human_scores.append(batch.score)
         trans_corr, _ = misc_utils.spearmanr(trans_results,human_scores)
         print(f"Hard: {hard_results.mean():.4f} | Hard Ext: {hardext_results.mean():.4f} | Transitive: {trans_corr}")
-        
+
 if __name__ == '__main__':
     main()

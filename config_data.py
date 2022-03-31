@@ -5,7 +5,7 @@ save_steps = 1000
 vocab_file=""
 
 train_hparams={
-        'dataset': { 'files': '/data_utils/multi_pos_train3.json',
+        'dataset': { 'files': 'data_utils/multi_pos_train3.json',
                      'vocab_file': vocab_file},
         'batch_size': 256,
         'lazy_strategy': 'all',
@@ -19,21 +19,21 @@ train_hparams={
 }
 
 hard_hparams={
-        'dataset': { 'files': '/data_utils/event_eval/hard.txt',
+        'dataset': { 'files': 'data_utils/event_eval/hard.txt',
         'vocab_file': vocab_file},
         'batch_size': 128,
         'shuffle': False
 }
 
 hardext_hparams={
-        'dataset': { 'files': '/data_utils/event_eval/hard_extend.txt',
+        'dataset': { 'files': 'data_utils/event_eval/hard_extend.txt',
         'vocab_file': vocab_file},
         'batch_size': 128,
         'shuffle': False
 }
 
 trans_hparams={
-        'dataset': { 'files': '/data_utils/event_eval/transitive.txt',
+        'dataset': { 'files': 'data_utils/event_eval/transitive.txt',
         'vocab_file': vocab_file},
         'batch_size': 128,
         'shuffle': False

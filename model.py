@@ -4,9 +4,11 @@ import torch
 import torch.nn as nn
 import texar.torch as tx
 from texar.torch.utils.utils import sequence_mask
+from texar.torch.data import embedding
 import numpy as np
+from modules import TransformerEncoder
 import torch.nn.functional as F
-
+import math
 class MarginLoss(nn.Module):
     def __init__(self, margin):
         super(MarginLoss, self).__init__()
@@ -18,6 +20,7 @@ class MarginLoss(nn.Module):
         pos_score: (batch)
         neg_score: (batch)
         '''
+
         return torch.mean(self.relu(neg_score - pos_score + self.margin))
     
 
@@ -87,12 +90,22 @@ class EventEncoder(nn.Module):
         batch_size = encoder_input.size(0)
         
         encoder_input_length = event_lengths
+        # positions = torch.arange(
+        #     encoder_input_length.max(), dtype=torch.long,
+        #     device=encoder_input.device).unsqueeze(0).expand(batch_size, -1)
+
+        # enc_input_embedding = self.input_fc(self._embedding_fn(encoder_input, positions))
+        # enc_input_embedding = self._embedding_fn(encoder_input, positions)
+
         outputs, pooled_output = self.encoder(
             inputs=encoder_input, sequence_length=encoder_input_length)
         inputs_padding = sequence_mask(
             event_lengths, event_ids.size()[1]).float()
         
+        # event_embedding = (outputs * inputs_padding.unsqueeze(-1))[:,1:].sum(1)/(event_lengths.unsqueeze(-1)-1)
+        # event_embedding = self.fc(enc_output[:,0,:])
         event_embedding = outputs[:,0,:]
+        # event_embedding = self.fc(event_embedding)
         if is_train:
             return event_embedding, outputs
         else:

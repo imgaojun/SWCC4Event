@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=0 python3 main.py --do-train
+CUDA_VISIBLE_DEVICES=2 python3 main.py --do-train

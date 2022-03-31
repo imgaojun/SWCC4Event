@@ -2,21 +2,24 @@ import copy
 
 import texar.torch as tx
 
-random_seed = 1234
+random_seed = 1234#1234
 
 lr=2e-7
 
 word_dim=768
 max_positon_length=1024
 hidden_dim = word_dim
-tau=0.3
+moco_t=0.3
+moco_m=0.9
 
 sinkhorn_iterations=3
 epsilon=0.05
 
 mem_lr=5e-4
-mem_size=10
+mem_t=0.3
+bank_size=10
 
+num_topics=50
 emb = {
     "name": "lookup_table",
     "dim": word_dim,

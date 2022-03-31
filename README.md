@@ -14,7 +14,14 @@ Coming soon....
 ### Model
 Coming soon....
 
-### Training/Testing
+### Quick Start
+```shell
+conda create -n swcc python=3.8
+conda activate swcc
+pip install -r requirements.txt
+```
+
+#### Training/Testing
 To train and test a specific model, run the bash files `train.sh` and `test.sh`. For example, to train a new model and test a specific model, do the following:
 
 ```shell

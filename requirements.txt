@@ -1,3 +1,6 @@
 texar-pytorch
 pytorch
 tqdm
+scipy
+sklearn
+tensorflow
