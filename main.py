@@ -241,8 +241,7 @@ def main() -> None:
             return_dict, _ = _calculate_loss(batch)
             avg_rec.add(return_dict)
         
-        print(avg_rec.avg())
-        valid_loss = avg_rec.avg(0)
+        valid_loss = avg_rec.avg(['nce_loss'])
         
         ###### Test data
 
