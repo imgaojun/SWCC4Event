@@ -11,10 +11,18 @@ train_hparams={
         'lazy_strategy': 'all',
         'num_parallel_calls': 10,
         'shuffle_buffer_size': 50000,
-        
         "allow_smaller_final_batch": False,
         "cache_strategy": "none",
         'shuffle': True,
+
+}
+
+valid_hparams={
+        'dataset': { 'files': 'data_utils/valid.json',
+                     'vocab_file': vocab_file},
+        'batch_size': 256,
+        "allow_smaller_final_batch": False,
+        'shuffle': False,
 
 }
 
