@@ -6,7 +6,6 @@ import texar.torch as tx
 from texar.torch.utils.utils import sequence_mask
 from texar.torch.data import embedding
 import numpy as np
-from modules import TransformerEncoder
 import torch.nn.functional as F
 import math
 class MarginLoss(nn.Module):
