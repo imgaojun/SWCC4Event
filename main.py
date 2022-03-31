@@ -36,7 +36,7 @@ parser.add_argument(
     "--do-tsne", action="store_true",
     help="Output tsne metadata.")
 parser.add_argument(
-    "--output-dir", type=str, default="./tau_03/",
+    "--output-dir", type=str, default="./models/",
     help="Path to save the trained model and logs.")
 parser.add_argument(
     "--log-file", type=str, default="exp.log",
@@ -245,7 +245,7 @@ def main() -> None:
             human_scores  += batch.score
         trans_corr, _ = misc_utils.spearmanr(trans_results,human_scores)
 
-        all_results = [hard_results.mean(), hardext_results.mean()]
+        all_results = np.array([hard_results.mean(), hardext_results.mean()])
         logger.info(f"Hard: {hard_results.mean():.4f} | Hard Ext: {hardext_results.mean():.4f} | Transitive: {trans_corr:.4f} ({len(trans_results)})")
         return all_results
     def _train_epoch(epoch):
