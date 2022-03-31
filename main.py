@@ -262,7 +262,7 @@ def main() -> None:
             if step % config_data.eval_steps == 0:
                 eval_results = _eval_model()
                 eval_results = np.array(eval_results)
-                if eval_results[0] >= 0.808 and eval_results[1] >=0.713:
+                if eval_results.mean() > best_eval_results.mean():
                     best_eval_results = eval_results
                     _save_best_model(best_eval_results)
                 model.train()
