@@ -225,13 +225,13 @@ def main() -> None:
         logger.info(f"saving model...epoch {epoch}")
         torch.save(model.state_dict(), output_dir / f"checkpoint{epoch}.pt")
 
-    def _save_best_model(results):
-        logger.info(f"saving best model... ")
+    def _save_step(step):
+        logger.info(f"saving model... step {step}")
         ckpt = {
             "model": model.state_dict(),
             "memory_bank": memory_bank.state_dict(),
         }
-        torch.save(ckpt, output_dir / f"best_last.pt")
+        torch.save(ckpt, output_dir / f"checkpoint{step}.pt")
 
     def _eval_model():
         model.eval()
@@ -242,7 +242,7 @@ def main() -> None:
             avg_rec.add(return_dict)
         
         valid_loss = avg_rec.avg('nce_loss')
-        
+        logger.info(f"valid loss: {valid_loss}")
         ###### Test data
 
         cosine_similarity = nn.CosineSimilarity(dim=1, eps=1e-6)
@@ -305,12 +305,9 @@ def main() -> None:
             if step % config_data.eval_steps == 0:
                 eval_results = _eval_model()
                 eval_results = np.array(eval_results)
-                if eval_results.mean() > best_eval_results.mean():
-                    best_eval_results = eval_results
-                    _save_best_model(best_eval_results)
                 model.train()
-            # if step % config_data.save_steps == 0:
-            #     _save_step(step)
+            if step % config_data.save_steps == 0:
+                _save_step(step)
             step += 1
 
     if args.do_train:
