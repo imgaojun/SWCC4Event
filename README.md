@@ -9,7 +9,7 @@ The Event triples we use for the training data are extracted from  the `New York
 Our event representation model is implemented using the `Texar-PyTorch` package. Our model starts from pre-trained checkpoints of `BERT-based-uncased` and we use the `CLS` token representation as the event representation. We train our model with a batch size of $256$ using an Adam optimizer. The learning rate is set as 2e-7 for the event representation model and 5e-4 for the prototype memory. We adopt the temperature $\tau=0.3$ and the number of prototypes used in our experiment is $10$.
 
 ### Dataset
-We recommend you use [gdown](https://github.com/wkentaro/gdown) to download our [data](https://drive.google.com/file/d/1FSZq0HM_rS2GKt0IDoMZlh6REytVrtFi/view?usp=sharing) from Google Drive:
+We recommend using [gdown](https://github.com/wkentaro/gdown) to download our [data](https://drive.google.com/file/d/1FSZq0HM_rS2GKt0IDoMZlh6REytVrtFi/view?usp=sharing) from Google Drive:
 ```shell
 pip install gdown
 gdown https://drive.google.com/u/0/uc?id=1FSZq0HM_rS2GKt0IDoMZlh6REytVrtFi&export=download
