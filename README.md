@@ -15,8 +15,6 @@ pip install gdown
 gdown https://drive.google.com/u/0/uc?id=1FSZq0HM_rS2GKt0IDoMZlh6REytVrtFi&export=download
 ```
 
-### Model
-Coming soon....
 
 ### Quick Start
 ```shell
